@@ -106,11 +106,14 @@ if __name__ == '__main__':
     
     # convert continuous attributes to categorical attributes
     divide_list = [1,2,6,7]
+    count= 0
     for i in range(9, len(label)-1):
         divide_list.append(i)
     for i in divide_list:
         train_data = divide_data(train_data, label, i)
+        count += 1
 
+    print(count)
     # write the dataset into a new csv
     output_path = "dating-binned.csv"
     write_into_csv(train_data, label, output_path)

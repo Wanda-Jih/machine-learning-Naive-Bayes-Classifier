@@ -9,8 +9,6 @@ import csv
 import sys
 
 
-path = 'C:/Users/wenne/OneDrive/桌面/course/data mining/hw/hmw2/'
-
 def read_write_data(input_path, output_path):
     
     # read csv file
@@ -71,7 +69,9 @@ def clean_quote_and_lowercase(train_data):
             upperCase += 1 # 5707
             
     print("Quotes removed from " + str(quote) + " cells.")
+    print("=============================================")
     print("Standardized " + str(upperCase) + " cells to lower case.")
+    print("=============================================")
     return train_data
 
 def value_assigned(train_data):
@@ -92,6 +92,7 @@ def value_assigned(train_data):
     train_data, new_dict = transfer_value(train_data, 8)
     print("Value assigned for law in column field: "  + str(new_dict['law']) + ".")
     
+    print("=============================================")
     return train_data
     
 def transfer_value(train_data, col):

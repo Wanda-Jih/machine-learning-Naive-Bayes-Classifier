@@ -33,17 +33,14 @@ def get_Test_data(file_path):
     return train_data,aim_data,label_info
 def Transfer_Array(data):
     if type(data[0])==int:
-        m,n=len(data),0
+        m,n=len(data),1
     else:
         m,n=len(data),len(data[0])
-    if n==0:
-        final_data = np.zeros(m)
-    else:
-        final_data=np.zeros([m,n])
+    final_data=np.zeros([m,n])
     for i in range(m):
-        if n!=0:
+        if n!=1:
             for j in range(n):
-                final_data[i][j]=float(data[i][j])
+                final_data[i][j]= float(data[i][j])
         else:
             final_data[i] = float(data[i])
     return final_data
@@ -51,23 +48,51 @@ def Transfer_Array(data):
 def Build_dict(train_data,column,value_dict,aim_data,label):
     #print(aim_data.shape)
     work_on_index=np.argwhere(aim_data==label)
+    # if(column == 0): 
+    #     print(work_on_index.shape)
+    #     print(work_on_index[0])
+    #     print(work_on_index[1])
+    #     print(work_on_index[2])
+    #     print(work_on_index[3])
+    #     print(work_on_index[4])
+    #     print(work_on_index[5])
+    #     print(work_on_index[6])
+    #     print(work_on_index[7])
+    #     print(work_on_index[8])
     #print(work_on_index[0])
     #print(work_on_index[1])
     #print(work_on_index.shape)
     #print(column)
     work_on_sample=train_data[work_on_index,column]
+    # print(train_data)
+    # if(column == 0): 
+    #     print(work_on_sample.shape)
+    #     # print(train_data[work_on_index,column])
+    #     for i in range(40):
+    #     # print(train_data[work_on_index,column])
+    #         print(work_on_sample[i])
+
     #print(work_on_sample.shape)
     #exit()
     probability_dict={}
     for value in value_dict:
         probability_dict[value]=len(np.argwhere(work_on_sample==value))/len(work_on_sample)
+        if column == 0:
+            print(len(np.argwhere(work_on_sample==value)))
+            print(len(work_on_sample))  
     probability_dict['total']=len(work_on_sample)
+    if column == 0:
+        print(probability_dict)
     return probability_dict
+
+
 def Form_conditional_probability(train_data,aim_data,i):
     value_dict=set()
     for k in range(len(train_data)):
         if int(train_data[k,i]) not in value_dict:
             value_dict.add(int(train_data[k,i]))
+            # if i == 8   :
+            #     print(int(train_data[k,i]))
     #deal with "ZERO COUNTS ARE A PROBLEM"
 
     all_dict={}
@@ -113,32 +138,39 @@ def nbc(t_frac):
     result = pd_reader.sample(random_state=47, frac=t_frac)
     use_index=result.index
     train_data, aim_data, label_info=get_Train_data(input_path,use_index)
+    
+    
+    # print(train_data)
     #Change the data to np array
     train_data=Transfer_Array(train_data)
     aim_data=Transfer_Array(aim_data)
-    aim_data=aim_data[:,0]
+
+    # print(train_data)
     #print(aim_data.shape)
     #exit()
     #Now we need to calculate the prior probability
     prior_true=len(np.argwhere(aim_data==1))/len(aim_data)
-    prior_false=1-prior_true
-    #Calculate the conditional probability
+    # prior_false=1-prior_true
+    # #Calculate the conditional probability
     record_dict={}
+    
     for i in range(len(train_data[0])):
         record_dict[label_info[i]]=Form_conditional_probability(train_data,aim_data,i)
-    #deal with "ZERO COUNTS ARE A PROBLEM"
-    #print(record_dict)
-    #Evaluating on the training set and then on the validation set
+    # #deal with "ZERO COUNTS ARE A PROBLEM"
+    # #print(record_dict)
+    # #Evaluating on the training set and then on the validation set
     accuracy=Evaluate(train_data,aim_data,label_info,record_dict,prior_true)
     print('Training Accuracy: %.2f'%accuracy)
-    #test performance
-    input_path = 'testSet.csv'
-    train_data, aim_data, label_info = get_Test_data(input_path)
-    train_data = Transfer_Array(train_data)
-    aim_data = Transfer_Array(aim_data)
-    aim_data = aim_data[:, 0]
-    accuracy=Evaluate(train_data,aim_data,label_info,record_dict,prior_true)
-    print('Testing Accuracy: %.2f'%accuracy)
+    
+    
+    # #test performance
+    # input_path = 'testSet.csv'
+    # train_data, aim_data, label_info = get_Test_data(input_path)
+    # train_data = Transfer_Array(train_data)
+    # aim_data = Transfer_Array(aim_data)
+    # aim_data = aim_data[:, 0]
+    # accuracy=Evaluate(train_data,aim_data,label_info,record_dict,prior_true)
+    # print('Testing Accuracy: %.2f'%accuracy)
 
 if __name__ == '__main__':
     nbc(1)
