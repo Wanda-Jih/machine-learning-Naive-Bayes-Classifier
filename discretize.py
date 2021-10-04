@@ -1,93 +1,48 @@
 import csv
 import sys
-import numpy as np
+import pandas as pd
 
 
 def read_data(input_data):
+    df = pd.read_csv(input_data)
+    return df    
 
-    # read csv file
-    csv_file = csv.reader(open(input_path, 'r'))
-    data = []
-    for row in csv_file:
-        data.append(row)
-    label = data[0]
+def divide_dataset(trainingSet, df, col, info):
 
-    train_data = []
-    for i, row in enumerate(data[1:]):
-        train_data.append(row)
-
-    return label, train_data
-
-def convert_data(train_data):
+    max_value = trainingSet.iloc[:, col].max()
+    min_value = trainingSet.iloc[:, col].min()
+    divide_value = (max_value - min_value) / 5
     
-    if type(train_data[0]) == int:
-        row, col = len(train_data), 1
-    else:
-        row, col = len(train_data), len(train_data[0])
+    if (col == 1 or col == 2):
+        max_value = 58
+        min_value = 18
+        divide_value = (max_value - min_value) / 5  
         
-    revised_data = np.zeros([row, col])
-    for i in range(row):
-        for j in range(col):
-            if col != 1:
-              revised_data[i][j] = float(train_data[i][j])                  
-            else:
-               revised_data[i] = float(train_data[i])
-
-    return revised_data
-
-def clean_data(train_data, label):
-    
-    clean_list = [6, 7]
-    for i in range(21, len(label)-4):
-        clean_list.append(i)
-    clean_list.append(len(label)-3)
-    clean_list.append(len(label)-2)
-    
-    for col in clean_list:
-        for row in range(len(train_data)):
-            if float(train_data[row][col]) > 10:
-                train_data[row][col] = 10
-                
-    return train_data
-
-def divide_data(train_data, label, col):
-    
-    # for col in divide_list:
-    max_value = np.max(train_data[:, col])
-    min_value = np.min(train_data[:, col])
-    divide_value = (max_value - min_value)/5
-
     new_records = [0]*5
     start_value = min_value
     
     for k in range(5):
         end_value =  start_value + divide_value
-        for i in range(len(train_data)):
-            value = train_data[i, col]
-            if value >= start_value and value < end_value:
-                new_records[k] += 1
-                train_data[i, col] = k
+        for i in range(len(df.index)):
+            value = trainingSet.iloc[i, col]
                 
-            # the biggest value
-            if value == max_value and k == 4:
+            if k == 0 and value == min_value:
                 new_records[k] += 1
-                train_data[i, col] = k        
+                df.iloc[i, col] = k  
+                
+            if value > start_value and value <= end_value:
+                new_records[k] += 1
+                df.iloc[i, col] = k
+
         start_value = end_value
         
-    print('%s: %s'%(label[col],str(new_records)))
+    print('%s: %s'%(info[col],str(new_records)))
     
-    return train_data
     
-def write_into_csv(train_data, label, output_path):
-      
-    with open(output_path, 'w', newline='') as csvfile:
-      writer = csv.writer(csvfile)
+def write_into_csv(df, output_path):
+    df.to_csv(output_path, index=False)  
     
-      writer.writerow(label)
-      
-      for i, row in enumerate(train_data):
-          writer.writerow(row)            
-
+    
 if __name__ == '__main__':
     
     if(len(sys.argv) != 2):
@@ -96,25 +51,20 @@ if __name__ == '__main__':
         input_path = sys.argv[1]
 
     # read csv
-    label, train_data = read_data(input_path)
+    trainingSet = read_data(input_path)
+    df = read_data(input_path)
 
-    # convert dataset to nump dataset
-    train_data = convert_data(train_data)
-    
-    # clean data [0~10]
-    train_data = clean_data(train_data, label)
-    
     # convert continuous attributes to categorical attributes
     divide_list = [1,2,6,7]
-    count= 0
-    for i in range(9, len(label)-1):
+    for i in range(9, 52):
         divide_list.append(i)
-    for i in divide_list:
-        train_data = divide_data(train_data, label, i)
-        count += 1
+      
+    info = list(df.columns.values)
+    for col in divide_list:
+        divide_dataset(trainingSet, df, col, info)
 
-    print(count)
+
     # write the dataset into a new csv
     output_path = "dating-binned.csv"
-    write_into_csv(train_data, label, output_path)
+    write_into_csv(df, output_path)
     

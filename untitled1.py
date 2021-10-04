@@ -163,14 +163,14 @@ def nbc(t_frac):
     print('Training Accuracy: %.2f'%accuracy)
     
     
-    # #test performance
-    # input_path = 'testSet.csv'
-    # train_data, aim_data, label_info = get_Test_data(input_path)
-    # train_data = Transfer_Array(train_data)
-    # aim_data = Transfer_Array(aim_data)
-    # aim_data = aim_data[:, 0]
-    # accuracy=Evaluate(train_data,aim_data,label_info,record_dict,prior_true)
-    # print('Testing Accuracy: %.2f'%accuracy)
+    #test performance
+    input_path = 'testSet.csv'
+    train_data, aim_data, label_info = get_Test_data(input_path)
+    train_data = Transfer_Array(train_data)
+    aim_data = Transfer_Array(aim_data)
+    aim_data = aim_data[:, 0]
+    accuracy=Evaluate(train_data,aim_data,label_info,record_dict,prior_true)
+    print('Testing Accuracy: %.2f'%accuracy)
 
 if __name__ == '__main__':
     nbc(1)

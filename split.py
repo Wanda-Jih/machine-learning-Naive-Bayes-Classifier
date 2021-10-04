@@ -17,30 +17,27 @@ def divide_data(testSet, input_path):
     
     # read csv file
     csv_file = csv.reader(open(input_path,'r'))    
-  
-    label = []
+    df = pd.read_csv(input_path)
+
     trainingData = []
     testData = []
     
     for i, row in enumerate(csv_file):
         if i == 0:
-            label = row
-        elif i in testSet:
+            continue;
+        if  i in testSet:
             testData.append(row)
         else:
             trainingData.append(row)
             
-    return label, trainingData, testData
+    dfTrain = pd.DataFrame(trainingData, columns = list(df.columns.values))
+    dfTest = pd.DataFrame(testData, columns = list(df.columns.values))
+    return dfTrain, dfTest
          
-def write_into_csv(train_data, label, output_path):
+def write_into_csv(train_data, output_path):
       
-    with open(output_path, 'w', newline='') as csvfile:
-      writer = csv.writer(csvfile)
-    
-      writer.writerow(label)
-      
-      for i, row in enumerate(train_data):
-          writer.writerow(row)            
+    train_data.to_csv(output_path, index=False)           
+
 
 if __name__ == '__main__':
     
@@ -56,10 +53,10 @@ if __name__ == '__main__':
     # read csv
     testSet = read_data(input_path)
     
-    # divide dataset : [label, training set, testing set]
-    label, trainingData, testData = divide_data(testSet, input_path)
+    # divide dataset 
+    trainingData, testData = divide_data(testSet, input_path)
     
     # write data into csv
-    write_into_csv(trainingData, label, triainingSet_path)
-    write_into_csv(testData, label, testSet_path)
+    write_into_csv(trainingData, triainingSet_path)
+    write_into_csv(testData, testSet_path)
     
