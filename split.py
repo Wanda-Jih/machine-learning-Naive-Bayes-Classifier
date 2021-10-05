@@ -29,7 +29,7 @@ def divide_data(testSet, input_path):
             testData.append(row)
         else:
             trainingData.append(row)
-            
+         
     dfTrain = pd.DataFrame(trainingData, columns = list(df.columns.values))
     dfTest = pd.DataFrame(testData, columns = list(df.columns.values))
     return dfTrain, dfTest

@@ -55,7 +55,7 @@ def draw_scatter_plot(success_rate, label_name):
     plt.title(label_name + ' success rate')
     plt.xlabel('Value')
     plt.ylabel('Success Rate')
-    plt.savefig(label_name + '_success_rate.jpg')
+    plt.savefig('img/' + label_name + '_success_rate.jpg')
     
 if __name__ == '__main__':
     

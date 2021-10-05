@@ -76,7 +76,7 @@ def draw_barplot(male_mean, female_mean):
             ["attractive","sincere","intelligence","funny","ambitious","interests"])
      
     plt.legend()
-    plt.savefig("gender_attributes.jpg")
+    plt.savefig("img/gender_attributes.jpg")
 
 if __name__ == '__main__':
     
@@ -87,8 +87,6 @@ if __name__ == '__main__':
 
     # read csv
     label, train_data = read_data(input_path)
-    print(train_data[0,0])
-    print(train_data[1,0])
 
     # divid dataset into sub_datasets
     male_data, female_data = divid_gender(train_data)

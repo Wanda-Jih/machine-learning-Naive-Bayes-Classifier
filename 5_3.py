@@ -1,7 +1,8 @@
 import pandas as pd
 import sys
+import matplotlib.pyplot as plt
 
-def nbc(t_frac):
+def nbc(t_frac, trainList, testList):
     if(len(sys.argv) != 2):
         training_path = "trainingSet.csv"
         test_path = "testSet.csv"
@@ -11,7 +12,6 @@ def nbc(t_frac):
 
     # read trainingSet.csv
     df = read_data(training_path, t_frac)
-
     # calculate prior probability
     prior_true_total, prior_false_total, prior_true, prior_false = prior_probability(df)
 
@@ -21,9 +21,10 @@ def nbc(t_frac):
     # evaluate the model and generate the accuracy
     result = evaluate(df, prior_true, prior_false, trueList, falseList)   
     accuracy = result/len(df["decision"])
+    trainList.append(accuracy)
     print('Training Accuracy: %.2f'%accuracy)
     
-     # read testSet.csv
+      # read testSet.csv
     df = read_data(test_path, t_frac)   
     
     # calculate prior probability
@@ -32,22 +33,26 @@ def nbc(t_frac):
     # evaluate the model and generate the accuracy
     result = evaluate(df, prior_true, prior_false, trueList, falseList)   
     accuracy = result/len(df["decision"])
+    testList.append(accuracy)
     print('Testing Accuracy: %.2f'%accuracy)    
+    
+    return trainList, testList
 
-def read_data(input_data, t_frac):
+def read_data(input_data, f):
     df = pd.read_csv(input_data)
-    if input_data == "trainingSet.csv":
-        df = df.sample(random_state=47, frac=t_frac)
+    data = df.sample(frac=f, random_state=47)   
+    data.to_csv("temp/tempTable.csv", index = False)
+    df = pd.read_csv("temp/tempTable.csv")
     return df    
 
 def prior_probability(df):
     
     decision = []
     decision = df["decision"]
-    
+       
     prior_true_total = 0
     prior_false_total = 0
-    for i in range(len(decision)):
+    for i in decision.index:
         if(decision[i] == 1):
             prior_true_total += 1
         else:
@@ -136,7 +141,24 @@ def evaluate(df, prior_true, prior_false, trueList, falseList)  :
         
     return result
 
+def draw_plot(F, accTrain, accTest):
+    
+    plt.figure(figsize=(15,10),dpi=100,linewidth = 2)
+    plt.plot(F, accTrain,'s-',color = 'r', label="accTrain")
+    plt.plot(F, accTest,'o-',color = 'g', label="accTest")
+    
+    plt.title("Different Fraction Accuracy", x=0.5, y=1.03)
+    plt.savefig("img/(5_3)different_fraction.jpg")
+    
+    
 
 if __name__ == "__main__":
-
-    nbc(1)
+    
+    trainList = []
+    testList = []
+    F = [0.01, 0.1,  0.2, 0.5, 0.6, 0.75, 0.9, 1]
+    for f in F:
+        print("fraction = " + str(f))
+        trainList, testList = nbc(f, trainList, testList)
+   
+    draw_plot(F, trainList, testList)
